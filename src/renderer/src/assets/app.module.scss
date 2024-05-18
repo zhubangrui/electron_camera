@@ -1,0 +1,4 @@
+.app_top_container {
+  @apply absolute top-0 h-[calc(100%-25px)] w-full z-10;
+  -webkit-app-region: drag;
+}
