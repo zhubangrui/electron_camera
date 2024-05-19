@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Camera from './components/camera/camera'
 import SettingBar from './components/settting_bar/setting_bar'
 import styles from './assets/app.module.scss'
@@ -7,7 +7,7 @@ import { useConfig } from './common/context/config_provider'
 
 function App(): JSX.Element {
   const [isConfig, setIsConfig] = useState(false)
-  const [isSet, setIsSet] = useState(false)
+  const [page, setPage] = useState('camera')
 
   const { shape, setConfigData } = useConfig()
   // const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
@@ -18,9 +18,9 @@ function App(): JSX.Element {
   const mouseLeave = (): void => {
     setIsConfig(false)
   }
-  const settingHandle = (val: { deviceId: string; title: string }): void => {
-    console.log(val)
-    setIsSet(false)
+  const settingHandle = (val: { deviceId: string }): void => {
+    setConfigData({ type: 'devices_id', value: val.deviceId })
+    setPage('camera')
   }
   const shapeHandle = (): void => {
     const type = 'shape'
@@ -30,9 +30,16 @@ function App(): JSX.Element {
       setConfigData({ type, value: 'Square' })
     }
   }
+  const setPageHandle = (): void => {
+    setPage('config')
+  }
+  //摄像头和配置页面切换时，发送到主进程，判断是否能改变窗口
+  useEffect(() => {
+    window.electron.ipcRenderer.send('set_page', page)
+  }, [page])
   return (
     <>
-      {isSet ? (
+      {page === 'config' ? (
         <Settings settings={settingHandle} />
       ) : (
         <div
@@ -46,7 +53,7 @@ function App(): JSX.Element {
             onMouseLeave={mouseLeave}
           >
             {isConfig && (
-              <SettingBar setIsSet={() => setIsSet(true)} shape={shape} shapeHandle={shapeHandle} />
+              <SettingBar setPage={setPageHandle} shape={shape} shapeHandle={shapeHandle} />
             )}
           </div>
         </div>

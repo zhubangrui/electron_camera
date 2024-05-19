@@ -1,13 +1,15 @@
+import { useConfig } from '@/common/context/config_provider'
 import { ReactNode, useEffect, useRef } from 'react'
-// import styles from './camera.module.scss'
+
 const Camera = (): ReactNode => {
+  const { devicesId } = useConfig()
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({
         audio: false,
-        video: true
+        video: devicesId ? { deviceId: devicesId } : true
       })
       .then((mediaStream) => {
         const video = videoRef?.current
@@ -20,11 +22,7 @@ const Camera = (): ReactNode => {
       })
   }, [])
 
-  return (
-    <main className="w-screen h-screen flex">
-      <video className=" object-cover " ref={videoRef}></video>
-    </main>
-  )
+  return <video className=" object-cover w-screen h-screen" ref={videoRef}></video>
 }
 
 export default Camera

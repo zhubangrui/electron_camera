@@ -4,11 +4,11 @@ import Square from '../../assets/images/square.png'
 import Round from '../../assets/images/round.png'
 
 interface IProps {
-  setIsSet: () => void
+  setPage: () => void
   shapeHandle: () => void
   shape: string
 }
-const SettingBar: FC<IProps> = ({ setIsSet, shape, shapeHandle }): ReactNode => {
+const SettingBar: FC<IProps> = ({ setPage, shape, shapeHandle }): ReactNode => {
   // const imgStyle = {
   //   height:
   // }
@@ -20,7 +20,7 @@ const SettingBar: FC<IProps> = ({ setIsSet, shape, shapeHandle }): ReactNode => 
         alt=""
         onClick={shapeHandle}
       />
-      <img src={Setting} className=" h-[15px] ml-1" alt="" onClick={setIsSet} />
+      <img src={Setting} className=" h-[15px] ml-1" alt="" onClick={setPage} />
     </div>
   )
 }

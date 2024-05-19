@@ -1,36 +1,56 @@
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react'
 
-type IParams = { type: 'devices_id' | 'shape' | 'title'; value: string }
+type IDevice = {
+  deviceId: string
+  groupId: string
+  kind: string
+  label: string
+}
+type IParams = { type: 'devices_id' | 'shape' | 'title'; value: string | IDevice }
+
 interface IConfig {
+  devices: IDevice[]
   devicesId: string
   shape: string
-  title: string
   setConfigData: (params: IParams) => void
 }
 const ConfigContext = createContext<IConfig>({
+  devices: [],
   devicesId: '',
-  title: '',
   shape: '',
   setConfigData: () => {}
 })
 const ConfigProvider = ({ children }: { children: ReactNode }): ReactNode => {
-  const [devicesId, setDevicesId] = useState('123')
-  const [title, setTitle] = useState('456')
+  const [devices, setDevices] = useState<IDevice[]>([])
+  const [devicesId, setDevicesId] = useState('')
   const [shape, setShape] = useState('Round')
 
-  useEffect(() => {}, [])
+  useEffect(() => {
+    navigator.mediaDevices
+      .enumerateDevices()
+      .then((devices) => {
+        const videoDevices = devices.filter((i) => i.kind.includes('video'))
+        if (videoDevices.length) {
+          setDevices(videoDevices)
+          setDevicesId(videoDevices[0].deviceId)
+        }
+      })
+      .catch((err) => {
+        console.error(`${err.name}: ${err.message}`)
+      })
+  }, [])
+  useEffect(() => {
+    console.log(shape)
+    window.electron.ipcRenderer.send('shape', shape)
+  }, [shape])
   const setConfigData = (params: IParams): void => {
     switch (params.type) {
       case 'devices_id': {
-        setDevicesId(params.value)
+        setDevicesId(params.value as string)
         break
       }
       case 'shape': {
-        setShape(params.value)
-        break
-      }
-      case 'title': {
-        setTitle(params.value)
+        setShape(params.value as string)
         break
       }
       default:
@@ -38,8 +58,8 @@ const ConfigProvider = ({ children }: { children: ReactNode }): ReactNode => {
     }
   }
   const data = {
+    devices,
     devicesId,
-    title,
     shape,
     setConfigData
   }

@@ -19,34 +19,33 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { Input } from '../ui/input'
+// import { Input } from '../ui/input'
 import { useConfig } from '@/common/context/config_provider'
 const FormSchema = z.object({
   device_id: z.string({
     required_error: '请选择摄像头.'
-  }),
-  user: z.string().min(2, {
-    message: '请输入'
   })
+  // user: z.string().min(2, {
+  //   message: '请输入'
+  // })
 })
 
 interface IProps {
-  settings: (val: { deviceId: string; title: string }) => void
+  settings: (val: { deviceId: string }) => void
 }
 const Settings: FC<IProps> = ({ settings }): ReactNode => {
-  const { title } = useConfig()
+  const { devices, devicesId } = useConfig()
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      device_id: 'm@google.com',
-      user: title
+      device_id: devicesId
+      // user: title
     }
   })
 
   const onSubmit = (data: z.infer<typeof FormSchema>): void => {
-    console.log(data)
-    const { device_id, user } = data
-    settings({ deviceId: device_id, title: user })
+    const { device_id } = data
+    settings({ deviceId: device_id })
   }
   return (
     <div className=" w-screen h-screen bg-slate-400 flex flex-col p-5">
@@ -58,23 +57,25 @@ const Settings: FC<IProps> = ({ settings }): ReactNode => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className=" text-white">选择摄像头</FormLabel>
-                <Select onValueChange={field.onChange} value="m@google.com">
+                <Select onValueChange={field.onChange} defaultValue={devicesId}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a verified email to display" />
+                      <SelectValue placeholder="请选择一个摄像头" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="m@example.com">m@example.com</SelectItem>
-                    <SelectItem value="m@google.com">m@google.com</SelectItem>
-                    <SelectItem value="m@support.com">m@support.com</SelectItem>
+                    {devices.map((i) => (
+                      <SelectItem value={i.deviceId} key={i.deviceId}>
+                        {i.label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
+          {/* <FormField
             control={form.control}
             name="user"
             render={({ field }) => (
@@ -85,7 +86,7 @@ const Settings: FC<IProps> = ({ settings }): ReactNode => {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           <Button type="submit">确定</Button>
         </form>
       </Form>

@@ -2,6 +2,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 
 import createWindow from './windows'
+import './ipc_main'
 
 app.whenReady().then(() => {
   // Set app user model id for windows
